@@ -32,6 +32,47 @@ Leave `DOC_URL` and `SHEET_URL` as they are; the menu doesn't use them.
 Because each copy carries its own copy of the script, each new doc asks for authorization
 once.
 
+## Automatic DFDs from a Google Form
+
+Instead of copying the master by hand, the team can submit the intake form and get a
+finished DFD by email. The menu still works alongside it.
+
+**What happens on submit:** the script copies the master DFD template into a new doc named
+`<project> - DFD`, runs the same build as the menu, shares the doc with the submitter as an
+editor, and emails them the link. If anything fails, the submitter and the trigger owner get
+an email with the error and the answers.
+
+**The form needs:**
+- a question whose title starts with "Spreadsheet" (or any answer that is a Google Sheets link)
+- optionally, a question starting with "Project" for the doc name
+- optionally, a question starting with "Email", or turn on **Settings > Responses > Collect
+  email addresses**, so the script knows who to share with
+
+Change the `QUESTION_*` values in `FormTrigger.gs` if your titles differ.
+
+### Setup (one time, by the person who will own the new DFDs)
+
+1. Open the form > three-dot menu > **Apps Script**. Name the project "DFD Builder Form".
+2. Add three files: `Code.gs` from this repo, `FormTrigger.gs` from this repo, and replace
+   `appsscript.json` with `form-trigger/appsscript.json` (turn on **Show "appsscript.json"**
+   under Project Settings first). The form needs a different manifest than the doc because
+   it also copies files and sends email.
+3. In `FormTrigger.gs`, set `MASTER_DOC_URL` to the master DFD template link. Optionally set
+   `OUTPUT_FOLDER_URL` to a shared drive folder so the whole team can find the DFDs.
+4. Choose `installFormTrigger` in the function dropdown and click **Run**. Approve the
+   permissions (same "unverified app" warning as the menu: **Advanced > Go to ...**).
+5. Submit a test response. To re-run on the latest response without submitting again, run
+   `testWithLastResponse`. Runs and errors show under **Executions** (left sidebar).
+
+### Things to know
+
+- Everything runs as the person who ran `installFormTrigger`. That account must be able to
+  open the master template and every project spreadsheet people submit, and it owns the
+  new docs (use a shared drive folder if that matters).
+- Running `installFormTrigger` again is safe; it replaces the old trigger.
+- When you change `Code.gs`, update it in both places: the master template's script and the
+  form's script.
+
 ## Behavior
 
 - Pages come from the **Content Pages - All Teams** tab. A Parent Menu Item starts a group,
@@ -46,5 +87,5 @@ once.
 
 ## Updating the script
 
-Fix it in the master template's Apps Script project. DFDs copied before the fix keep the
+Fix it in the master template's Apps Script project (and the form's, if you use the form). DFDs copied before the fix keep the
 old version; only new copies get the update.

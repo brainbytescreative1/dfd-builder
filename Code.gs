@@ -40,8 +40,9 @@ const CONFIG = {
 
 /** Adds the DFD Builder menu when the doc opens (container-bound script). */
 function onOpen() {
-  DocumentApp.getUi()
-    .createMenu('DFD Builder')
+  let ui;
+  try { ui = DocumentApp.getUi(); } catch (e) { return; } // not in a doc (e.g. the form project)
+  ui.createMenu('DFD Builder')
     .addItem('Build pages from spreadsheet...', 'buildFromMenu')
     .addToUi();
 }
